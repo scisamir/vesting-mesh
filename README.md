@@ -1,3 +1,6 @@
+# vesting-mesh
+A custom vesting contract that vests token to several wallet addresses.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -34,3 +37,72 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+
+# vesting
+
+Write validators in the `validators` folder, and supporting functions in the `lib` folder using `.ak` as a file extension.
+
+```aiken
+validator my_first_validator {
+  spend(_datum: Option<Data>, _redeemer: Data, _output_reference: Data, _context: Data) {
+    True
+  }
+}
+```
+
+## Building
+
+```sh
+aiken build
+```
+
+## Configuring
+
+**aiken.toml**
+```toml
+[config.default]
+network_id = 41
+```
+
+Or, alternatively, write conditional environment modules under `env`.
+
+## Testing
+
+You can write tests in any module using the `test` keyword. For example:
+
+```aiken
+use config
+
+test foo() {
+  config.network_id + 1 == 42
+}
+```
+
+To run all tests, simply do:
+
+```sh
+aiken check
+```
+
+To run only tests matching the string `foo`, do:
+
+```sh
+aiken check -m foo
+```
+
+## Documentation
+
+If you're writing a library, you might want to generate an HTML documentation for it.
+
+Use:
+
+```sh
+aiken docs
+```
+
+## Resources
+
+Find more on the [Aiken's user manual](https://aiken-lang.org).

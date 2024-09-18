@@ -1,0 +1,81 @@
+{
+  "preamble": {
+    "title": "scisamir/vesting",
+    "description": "Aiken contracts for project 'scisamir/vesting'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.1+0905146"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "stake.stake.spend",
+      "datum": {
+        "title": "datum",
+        "schema": {
+          "$ref": "#/definitions/stake~1MyDatum"
+        }
+      },
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Void"
+        }
+      },
+      "compiledCode": "59014401010032323232323225333002323232323253330073370e900118041baa001132323232533300b3370e900018061baa0021323232323253330103300100d375c6028006294454ccc040cc0040340084c8c94ccc048cdc3a400460266ea80044cdc48031bad3016301437540022940c004c04cdd5180098099baa301530163016301630163016301630163013375401c4602a002294088c8cc004004dd6180b180b980b980b980b980b980b980b980b980a1baa00322533301600114a0264a66602866e3cdd7180c0010020a511330030030013018001375c6024602600260240046eb4c040004c034dd5180798069baa00216533300a3370e900018059baa0051533300d300c375400a2930b0b18069807001180600098049baa00116300a300b0023009001300900230070013004375400229309b2b2b9a5573aaae7955cfaba157441",
+      "hash": "a8b8d5cdd9b21678753d9a99bd20857d1931d29816ddf56e9bd06e9c"
+    },
+    {
+      "title": "stake.stake.else",
+      "compiledCode": "59014401010032323232323225333002323232323253330073370e900118041baa001132323232533300b3370e900018061baa0021323232323253330103300100d375c6028006294454ccc040cc0040340084c8c94ccc048cdc3a400460266ea80044cdc48031bad3016301437540022940c004c04cdd5180098099baa301530163016301630163016301630163013375401c4602a002294088c8cc004004dd6180b180b980b980b980b980b980b980b980b980a1baa00322533301600114a0264a66602866e3cdd7180c0010020a511330030030013018001375c6024602600260240046eb4c040004c034dd5180798069baa00216533300a3370e900018059baa0051533300d300c375400a2930b0b18069807001180600098049baa00116300a300b0023009001300900230070013004375400229309b2b2b9a5573aaae7955cfaba157441",
+      "hash": "a8b8d5cdd9b21678753d9a99bd20857d1931d29816ddf56e9bd06e9c"
+    }
+  ],
+  "definitions": {
+    "POSIXTime": {
+      "title": "POSIXTime",
+      "dataType": "integer"
+    },
+    "VerificationKeyHash": {
+      "title": "VerificationKeyHash",
+      "dataType": "bytes"
+    },
+    "Void": {
+      "title": "Unit",
+      "anyOf": [
+        {
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        }
+      ]
+    },
+    "stake/MyDatum": {
+      "title": "MyDatum",
+      "anyOf": [
+        {
+          "title": "MyDatum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "lock_until",
+              "$ref": "#/definitions/POSIXTime"
+            },
+            {
+              "title": "owner",
+              "$ref": "#/definitions/VerificationKeyHash"
+            },
+            {
+              "title": "beneficiary",
+              "$ref": "#/definitions/VerificationKeyHash"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

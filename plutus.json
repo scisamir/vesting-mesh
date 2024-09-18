@@ -1,0 +1,75 @@
+{
+  "preamble": {
+    "title": "scisamir/vesting",
+    "description": "Aiken contracts for project 'scisamir/vesting'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.1+0905146"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "stake.stake.spend",
+      "datum": {
+        "title": "datum",
+        "schema": {
+          "$ref": "#/definitions/stake~1MyDatum"
+        }
+      },
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "compiledCode": "59012801010032323232323225333002323232323253330073370e900118041baa0011323232533300a3370e900018059baa00113232323232533300f3300100c375c6026006294454ccc03ccc0040300084c8c94ccc044cdc3a400460246ea80044cdc48031bad3015301337540022940c004c048dd5180098091baa301430153015301530153015301530153012375401a46028002294088c8cc004004dd6180a980b180b180b180b180b180b180b180b18099baa00322533301500114a0264a66602666e3cdd7180b8010020a511330030030013017001375c6022602400260220046eb4c03c004c030dd5180718061baa00116300d300e002300c001300937540022c6014601600460120026012004600e00260086ea8004526136565734aae7555cf2ab9f5742ae89",
+      "hash": "cece1e3c38ff744d154a0bab8b840a0b744f81093aad52fda10bfe71"
+    },
+    {
+      "title": "stake.stake.else",
+      "compiledCode": "59012801010032323232323225333002323232323253330073370e900118041baa0011323232533300a3370e900018059baa00113232323232533300f3300100c375c6026006294454ccc03ccc0040300084c8c94ccc044cdc3a400460246ea80044cdc48031bad3015301337540022940c004c048dd5180098091baa301430153015301530153015301530153012375401a46028002294088c8cc004004dd6180a980b180b180b180b180b180b180b180b18099baa00322533301500114a0264a66602666e3cdd7180b8010020a511330030030013017001375c6022602400260220046eb4c03c004c030dd5180718061baa00116300d300e002300c001300937540022c6014601600460120026012004600e00260086ea8004526136565734aae7555cf2ab9f5742ae89",
+      "hash": "cece1e3c38ff744d154a0bab8b840a0b744f81093aad52fda10bfe71"
+    }
+  ],
+  "definitions": {
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
+    "POSIXTime": {
+      "title": "POSIXTime",
+      "dataType": "integer"
+    },
+    "VerificationKeyHash": {
+      "title": "VerificationKeyHash",
+      "dataType": "bytes"
+    },
+    "stake/MyDatum": {
+      "title": "MyDatum",
+      "anyOf": [
+        {
+          "title": "MyDatum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "lock_until",
+              "$ref": "#/definitions/POSIXTime"
+            },
+            {
+              "title": "owner",
+              "$ref": "#/definitions/VerificationKeyHash"
+            },
+            {
+              "title": "beneficiary",
+              "$ref": "#/definitions/VerificationKeyHash"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
