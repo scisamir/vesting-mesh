@@ -131,6 +131,9 @@ export default function Vesting({ meshTxBuilder, userWallet, setUserWallet, bloc
             const signedTx = await userWallet?.signTx(unsignedTx!);
             const txHash = await userWallet?.submitTx(signedTx!);
 
+            // reset txbuilder
+            meshTxBuilder?.reset();
+
             // remove below
             console.log(`${lockAdaAmount} tADA locked into the contract`);
             blockchainProvider?.onTxConfirmed(txHash!, () => {
@@ -139,6 +142,8 @@ export default function Vesting({ meshTxBuilder, userWallet, setUserWallet, bloc
                 setLocking(false);
             });
         } catch (err) {
+            // reset txbuilder
+            meshTxBuilder?.reset();
             setLocking(false);
             console.log(err);
         }
@@ -176,8 +181,7 @@ export default function Vesting({ meshTxBuilder, userWallet, setUserWallet, bloc
         try {
             const lockTxHashUtxos = await blockchainProvider?.fetchUTxOs(txHashForUnlock);
 
-            const { utxos, walletAddress, collateral } = await getWalletForTx(userWallet!);
-            const { input: collateralInput, output: collateralOutput } = collateral;
+            const { walletAddress } = await getWalletForTx(userWallet!);
             const { pubKeyHash } = deserializeAddress(walletAddress);
 
             const unlockerUtxos = lockTxHashUtxos!.filter(utxo => {
@@ -194,50 +198,65 @@ export default function Vesting({ meshTxBuilder, userWallet, setUserWallet, bloc
             const txBuilder = meshTxBuilder;
 
             for (let i = 0; i < unlockerUtxos.length; i++) {
-                const utxo = unlockerUtxos[i];
-                const datum = deserializeDatum<Datum>(utxo.output.plutusData!);
+                try {
+                    const { utxos, walletAddress, collateral } = await getWalletForTx(userWallet!);
+                    const { input: collateralInput, output: collateralOutput } = collateral;
+                    const { pubKeyHash } = deserializeAddress(walletAddress);
 
-                const invalidBefore = unixTimeToEnclosingSlot(
-                    Math.min(datum.fields[0].int as number, Date.now() - 15000),
-                    SLOT_CONFIG_NETWORK.preprod
-                ) + 1;
+                    const utxo = unlockerUtxos[i];
+                    const datum = deserializeDatum<Datum>(utxo.output.plutusData!);
 
-                txBuilder?.spendingPlutusScript("V3")
-                    .txIn(
-                        utxo.input.txHash,
-                        utxo.input.outputIndex,
-                        utxo.output.amount,
-                        scriptAddr
-                    )
-                    .spendingReferenceTxInInlineDatumPresent()
-                    .spendingReferenceTxInRedeemerValue("")
-                    .txInScript(scriptCbor)
-                    .txOut(walletAddress, [])
-                    .txInCollateral(
-                        collateralInput.txHash,
-                        collateralInput.outputIndex,
-                        collateralOutput.amount,
-                        collateralOutput.address
-                    )
-                    .invalidBefore(invalidBefore)
+                    const invalidBefore = unixTimeToEnclosingSlot(
+                        Math.min(datum.fields[0].int as number, Date.now() - 15000),
+                        SLOT_CONFIG_NETWORK.preprod
+                    ) + 1;
+
+                    await txBuilder?.spendingPlutusScript("V3")
+                        .txIn(
+                            utxo.input.txHash,
+                            utxo.input.outputIndex,
+                            utxo.output.amount,
+                            scriptAddr
+                        )
+                        .spendingReferenceTxInInlineDatumPresent()
+                        .spendingReferenceTxInRedeemerValue("")
+                        .txInScript(scriptCbor)
+                        .txOut(walletAddress, [])
+                        .txInCollateral(
+                            collateralInput.txHash,
+                            collateralInput.outputIndex,
+                            collateralOutput.amount,
+                            collateralOutput.address
+                        )
+                        .invalidBefore(invalidBefore)
+                        .requiredSignerHash(pubKeyHash)
+                        .changeAddress(walletAddress)
+                        .selectUtxosFrom(utxos)
+                        .complete();
+
+                    const unsignedTx = txBuilder?.txHex;
+                    const signedTx = await userWallet?.signTx(unsignedTx!);
+                    const txHash = await userWallet?.submitTx(signedTx!);
+
+                    // reset txbuilder
+                    meshTxBuilder?.reset();
+
+                    blockchainProvider?.onTxConfirmed(txHash!, () => {
+                        setUnlockTxHash(txHash);
+                        // remove
+                        console.log(`${lockAdaAmount} tADA unlocked!`);
+                        setUnlocking(null);
+                    });
+                } catch (err) {
+                    // reset txbuilder
+                    meshTxBuilder?.reset();
+                    setUnlocking(null);
+                    console.log(err);
+                }
             }
-
-            await txBuilder?.requiredSignerHash(pubKeyHash)
-                .changeAddress(walletAddress)
-                .selectUtxosFrom(utxos)
-                .complete();
-
-            const unsignedTx = txBuilder?.txHex;
-            const signedTx = await userWallet?.signTx(unsignedTx!);
-            const txHash = await userWallet?.submitTx(signedTx!);
-
-            blockchainProvider?.onTxConfirmed(txHash!, () => {
-                setUnlockTxHash(txHash);
-                // remove
-                console.log(`${lockAdaAmount} tADA unlocked!`);
-                setUnlocking(null);
-            });
         } catch (err) {
+            // reset txbuilder
+            meshTxBuilder?.reset();
             setUnlocking(null);
             console.log(err);
         }
